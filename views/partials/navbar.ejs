@@ -26,9 +26,13 @@
             <a class="nav-link" href="/register">Register</a>
           </li>
           <% } else {%>
-            <li class="nav-item">
+            <div class="nav-item">
+              <p class="navbar-text mb-0 text-white">Logged in as <%= currentUser.username %>
+              </p>
+            </div>
+            <button class="nav-item btn btn-dark  px-2 py-0 ms-2" type="button">
               <a class="nav-link" href="/logout">Logout</a>
-            </li>
+            </button>
             <% } %>
       </div>
     </div>
