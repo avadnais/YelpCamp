@@ -13,6 +13,7 @@ const methodOverride = require('method-override');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
@@ -40,15 +41,20 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(mongoSanitize({
+	replaceWith: '_'
+}))
 
 const sessionConfig = {
+	name: 'session',
 	secret: 'placeholder',
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
 		expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
 		maxAge: 1000 * 60 * 60 * 24 * 7,
-		httpOnly: true
+		httpOnly: true,
+		//secure: true
 	}
 };
 app.use(session(sessionConfig));
