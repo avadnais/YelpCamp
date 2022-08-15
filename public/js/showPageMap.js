@@ -5,6 +5,9 @@ const map = new mapboxgl.Map({
 	center: campground.geometry.coordinates, // starting position [lng, lat]
 	zoom: 9 // starting zoom
 });
+
+map.addControl(new mapboxgl.NavigationControl());
+
 map.on('style.load', () => {
 	map.setFog({}); // Set the default atmosphere style
 });
