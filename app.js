@@ -18,8 +18,11 @@ const mongoSanitize = require('express-mongo-sanitize');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
+const MongoDBStore = require('connect-mongo')(session)
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
+
+mongoose.connect(dbUrl, {
 	useNewUrlParser: true,
 	useCreateIndex: true,
 	useUnifiedTopology: true,
@@ -45,9 +48,22 @@ app.use(mongoSanitize({
 	replaceWith: '_'
 }))
 
+const secret = process.env.SECRET || 'placeholder'
+
+const store = new MongoDBStore({
+	url: dbUrl,
+	secret: secret,
+	touchAfter: 24 * 60 * 60
+});
+
+store.on('error', function(e) {
+	console.log("Session Store error", e)
+})
+
 const sessionConfig = {
+	store,
 	name: 'session',
-	secret: 'placeholder',
+	secret: secret,
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
@@ -73,10 +89,6 @@ app.use((req, res, next) => {
 	res.locals.error = req.flash('error');
 	next();
 });
-
-// /register  - form
-// POST /register - create a user
-// POST /logout
 
 app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);
